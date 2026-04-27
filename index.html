@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنقاذ الكوكب</title>
+
+<style>
+body {
+  margin:0;
+  font-family:Arial;
+  overflow:hidden;
+  text-align:center;
+  background:#cfe8ff;
+}
+
+#title {
+  position:fixed;
+  top:10px;
+  width:100%;
+  font-size:26px;
+  font-weight:bold;
+  color:#ff9ecb;
+  z-index:2000;
+}
+
+.screen{
+  position:fixed;
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+.card{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  width:80%;
+  max-width:400px;
+}
+
+#planet{
+  width:250px;
+  height:250px;
+  border-radius:50%;
+  margin:15px auto;
+  position:relative;
+  background:radial-gradient(circle,#7ed957,#1e7d32);
+}
+
+.bad{
+  position:absolute;
+  font-size:24px;
+  cursor:pointer;
+}
+
+button{
+  padding:10px 15px;
+  margin-top:10px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+#pauseBtn{
+  position:fixed;
+  top:10px;
+  left:10px;
+  display:none;
+  z-index:3000;
+}
+
+#pauseMenu{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:#0008;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:4000;
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">إنقاذ الكوكب💫</div>
+<button id="pauseBtn" onclick="pauseGame()">⏸</button>
+
+<!-- الفكرة -->
+<div id="screen1" class="screen">
+  <div class="card">
+    <p>
+لعبة “إنقاذ الكوكب” هي لعبة تفاعلية ممتعة تهدف إلى توعية اللاعبين بأهمية حماية البيئة بطريقة بسيطة ومسلية. يظهر في الكوكب عدة مشاكل مثل النار 🔥، التلوث 🌫️، والنفايات 🗑️، وعلى اللاعب اختيار الأداة المناسبة لكل مشكلة. فإذا ظهرت النار يستخدم الماء 💧 ويضغط عليها لإطفائها، وإذا ظهر التلوث يختار الزراعة 🌳، وإذا ظهرت النفايات يستخدم التنظيف ♻️. كل اختيار صحيح يزيد النقاط ويحسّن الكوكب.
+    </p>
+    <button onclick="goName()">التالي</button>
+  </div>
+</div>
+
+<!-- الاسم -->
+<div id="screen2" class="screen" style="display:none;">
+  <div class="card">
+    <input id="nameInput" oninput="checkName()">
+    <button id="startBtn" disabled onclick="startGame()">ابدأ</button>
+  </div>
+</div>
+
+<!-- الوقف -->
+<div id="pauseMenu" class="screen" style="display:none;">
+  <div class="card">
+    <button onclick="resumeGame()">اكمال اللعب</button>
+    <button onclick="goHome()">العوده</button>
+  </div>
+</div>
+
+<!-- الفوز -->
+<div id="winScreen" class="screen" style="display:none;">
+  <div class="card">
+    <h3 id="winText"></h3>
+    <button onclick="restartGame()">اعادة اللعب</button>
+    <button onclick="goHome()">العوده</button>
+  </div>
+</div>
+
+<!-- اللعبة -->
+<div id="game" style="display:none;">
+
+<h1>🌍 إنقاذ الكوكب</h1>
+
+<div id="toolText">💧 الماء</div>
+<div id="scoreText">0</div>
+
+<div id="planet"></div>
+
+<div>
+<button onclick="setTool('💧','الماء💦')">ماء</button>
+<button onclick="setTool('🌳','الزراعه🌱')">زراعة</button>
+<button onclick="setTool('♻️','التنظيف♻️')">تنظيف</button>
+</div>
+
+</div>
+
+<script>
+
+let tool="💧";
+let score=0;
+let name="";
+let interval;
+let paused=false;
+
+const scoreText=document.getElementById("scoreText");
+
+/* البداية */
+function goName(){
+  screen1.style.display="none";
+  screen2.style.display="flex";
+}
+
+function checkName(){
+  startBtn.disabled = nameInput.value.trim()==="";
+}
+
+/* بدء */
+function startGame(){
+  name = nameInput.value;
+
+  screen2.style.display="none";
+  game.style.display="block";
+  pauseBtn.style.display="block";
+  title.style.display="none";
+
+  startLoop();
+}
+
+/* تشغيل */
+function startLoop(){
+  clearInterval(interval);
+  interval = setInterval(spawn,1200);
+}
+
+/* إيقاف */
+function pauseGame(){
+  paused = true;
+  clearInterval(interval);
+  pauseMenu.style.display="flex";
+}
+
+/* استمرار */
+function resumeGame(){
+  paused = false;
+  pauseMenu.style.display="none";
+  startLoop();
+}
+
+/* ✅ الإصلاح الحقيقي للعودة */
+function goHome(){
+  clearInterval(interval);
+  interval = null;
+  paused = false;
+  score = 0;
+  name = "";
+
+  screen1.style.display="flex";
+  screen2.style.display="none";
+  game.style.display="none";
+  pauseMenu.style.display="none";
+  winScreen.style.display="none";
+
+  pauseBtn.style.display="none";
+  title.style.display="block";
+
+  updateScore();
+}
+
+/* إعادة اللعب */
+function restartGame(){
+  score = 0;
+  updateScore();
+
+  winScreen.style.display="none";
+  game.style.display="block";
+
+  startLoop();
+}
+
+/* الأدوات */
+function setTool(t,text){
+  tool = t;
+  toolText.innerText = "الأداة الحالية: " + text;
+}
+
+/* النقاط */
+function updateScore(){
+  scoreText.innerText = score;
+}
+
+/* اللعب */
+function spawn(){
+  if(paused) return;
+
+  let p=document.createElement("div");
+  p.className="bad";
+
+  let r=Math.random();
+  if(r<0.33)p.textContent="🔥",p.type="fire";
+  else if(r<0.66)p.textContent="🌫️",p.type="pollution";
+  else p.textContent="🗑️",p.type="trash";
+
+  p.style.left=Math.random()*200+"px";
+  p.style.top=Math.random()*200+"px";
+
+  p.onclick=()=>{
+
+    let ok =
+      (p.type=="fire"&&tool=="💧")||
+      (p.type=="pollution"&&tool=="🌳")||
+      (p.type=="trash"&&tool=="♻️");
+
+    score += ok ? 10 : -5;
+    updateScore();
+
+    if(score >= 100){
+      clearInterval(interval);
+      paused = true;
+
+      game.style.display="none";
+      winScreen.style.display="flex";
+
+      winText.innerText = `احسنت يا ${name} تم انقاذ البيئه بنجاح😄`;
+    }
+
+    p.remove();
+  };
+
+  planet.appendChild(p);
+  setTimeout(()=>p.remove(),2500);
+}
+
+</script>
+
+</body>
+</html>
